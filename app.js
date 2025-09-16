@@ -45,22 +45,45 @@ function setStatus(text, type = 'info') {
 }
 
 async function startCamera() {
-  const constraints = {
-    audio: false,
-    video: {
-      facingMode: { ideal: 'environment' },
-      width: { ideal: 1280 },
-      height: { ideal: 720 }
-    }
-  };
+  // 關閉舊串流
+  try { mediaStream?.getTracks().forEach(t => t.stop()); } catch {}
+
+  // 1) 優先強制後置鏡頭
   try {
-    mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
-  } catch (e) {
-    mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+    mediaStream = await navigator.mediaDevices.getUserMedia({
+      audio: false,
+      video: {
+        facingMode: { exact: 'environment' },
+        width: { ideal: 1280 },
+        height: { ideal: 720 }
+      }
+    });
+  } catch (e1) {
+    // 2) 先拿權限 → enumerate 找後置鏡頭
+    try {
+      const tmp = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const cams = devices.filter(d => d.kind === 'videoinput');
+      const back = cams.find(d => /back|rear|environment/i.test(d.label)) || cams[cams.length - 1];
+      if (back) {
+        tmp.getTracks().forEach(t => t.stop());
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+          audio: false,
+          video: { deviceId: { exact: back.deviceId }, width: { ideal: 1280 }, height: { ideal: 720 } }
+        });
+      } else {
+        mediaStream = tmp;
+      }
+    } catch (e2) {
+      mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+    }
   }
+
   els.video.srcObject = mediaStream;
   await els.video.play().catch(()=>{});
+  els.video.style.transform = 'none'; // 確保無鏡像
 
+  // Torch 能力檢查
   const track = mediaStream.getVideoTracks?.()[0];
   const cap = track?.getCapabilities?.() || {};
   hasTorch = !!cap.torch;
@@ -93,13 +116,8 @@ async function init() {
   overlayCtrl.setContent('image');
 
   detector = new HorizontalColorDetector({
-    targetH: 190,
-    hTol: 18,
-    minS: 0.35,
-    minV: 0.35,
-    rowY: 0.5,
-    procW: 240,
-    minRun: 8
+    targetH: 190, hTol: 18, minS: 0.35, minV: 0.35,
+    rowY: 0.5, procW: 240, minRun: 8
   });
   detector.attach(els.video, els.procCanvas);
 
@@ -138,7 +156,6 @@ async function init() {
     setStatus('已保存或已開啟分享面板', 'success');
   });
 
-  // AR.js 模式（如不需要，也可刪除這顆按鈕與事件）
   if (els.btnArjs) {
     els.btnArjs.addEventListener('click', () => {
       window.location.href = 'arjs.html';
@@ -188,7 +205,6 @@ function runDetectionStep() {
   const result = detector.detect();
   if (result) {
     overlayCtrl.updateAnchor(result.xNorm, false);
-
     if (detState !== 'locked') {
       setStatus('已偵測到目標，微調手機以穩定對齊（或改用 AR.js 模式）', 'success');
       detState = 'locked';
@@ -196,7 +212,6 @@ function runDetectionStep() {
     lostCount = 0;
   } else {
     overlayCtrl.updateAnchor(0.5, false);
-
     if (detState === 'locked') {
       lostCount++;
       if (lostCount > 10) {

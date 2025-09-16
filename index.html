@@ -30,6 +30,7 @@
       <div id="camera-container">
         <video id="camera" playsinline autoplay muted></video>
 
+        <!-- 疊加容器（AR效果） -->
         <div id="overlay-container" aria-hidden="true">
           <img id="overlay-image" src="assets/overlay.png" alt="" />
           <video id="overlay-video" loop muted playsinline class="hidden">
@@ -37,9 +38,11 @@
           </video>
         </div>
 
+        <!-- 視覺輔助：可選的水平掃描線 -->
         <div id="scan-line"></div>
       </div>
 
+      <!-- 頂部工具列 -->
       <header class="topbar">
         <button id="btn-torch" class="btn icon-only" title="手電筒">🔦</button>
         <div class="spacer"></div>
@@ -53,20 +56,21 @@
         <span id="status-text">準備中...</span>
       </div>
 
-      <!-- 底部工具列（已移除 XR 按鈕） -->
+      <!-- 底部工具列 -->
       <footer class="bottombar">
         <div class="bar">
           <button id="btn-capture" class="btn btn-primary">
             <span class="icon">⬇️</span> 截圖保存
           </button>
-          <!-- 如需保留 AR.js 模式，按鈕在此；若不需要可整行刪掉 -->
           <button id="btn-arjs" class="btn outline" title="AR.js 影像追蹤模式">AR.js 模式</button>
         </div>
       </footer>
     </section>
   </div>
 
+  <!-- 隱藏處理用畫布（影像下採樣與分析） -->
   <canvas id="proc-canvas" class="hidden"></canvas>
+  <!-- 截圖合成畫布 -->
   <canvas id="capture-canvas" class="hidden"></canvas>
 
   <script type="module" src="app.js"></script>

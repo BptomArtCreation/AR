@@ -1,7 +1,8 @@
 {
   "name": "AR Overlay Demo",
   "short_name": "AR Overlay",
-  "start_url": "/",
+  "start_url": ".",
+  "scope": ".",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0f1222",
