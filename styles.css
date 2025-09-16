@@ -93,3 +93,34 @@ html, body, #app { height: 100%; margin: 0; background: #0f1222; color: var(--te
   0%,100% { box-shadow: 0 10px 30px rgba(0, 230, 255, 0.25); transform: translateY(0); }
   50% { box-shadow: 0 18px 40px rgba(0, 230, 255, 0.4); transform: translateY(-2px); }
 }
+
+/* 新增：底部即時提示（Toast/Pill） */
+.status-tip {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(env(safe-area-inset-bottom) + 86px);
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: var(--glass);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  color: var(--text);
+  font-size: 14px;
+  box-shadow: var(--shadow);
+  z-index: 5;
+}
+.status-tip .dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #9aa3b2; box-shadow: 0 0 0 2px rgba(255,255,255,0.06) inset;
+}
+
+.status-tip.info   { border: 1px solid #00e5ff40; }
+.status-tip.success{ border: 1px solid #22c55e44; }
+.status-tip.warn   { border: 1px solid #f59e0b44; }
+.status-tip.error  { border: 1px solid #ef444444; }
+
+.status-tip.info   .dot { background: #00e5ff; }
+.status-tip.success .dot { background: #22c55e; }
+.status-tip.warn    .dot { background: #f59e0b; }
+.status-tip.error   .dot { background: #ef4444; }
