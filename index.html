@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#13151a" />
+  <!-- iOS PWA 支援 -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <title>AR Overlay Demo</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- 啟動畫面 -->
+    <section id="start-screen" class="screen">
+      <div class="branding">
+        <h1>AR Overlay</h1>
+        <p>點擊下方按鈕開啟後置鏡頭</p>
+      </div>
+      <button id="btn-start" class="btn btn-primary big">
+        <span class="icon">📷</span>
+        啟動相機
+      </button>
+      <div class="tip">不會上傳影像，僅在本機處理</div>
+    </section>
+
+    <!-- 相機+疊加區 -->
+    <section id="camera-screen" class="screen hidden">
+      <div id="camera-container">
+        <!-- 相機串流畫面 -->
+        <video id="camera" playsinline autoplay muted></video>
+
+        <!-- 疊加容器（AR效果） -->
+        <div id="overlay-container" aria-hidden="true">
+          <!-- 預設為圖片，可切換為影片 -->
+          <img id="overlay-image" src="assets/overlay.png" alt="" />
+          <video id="overlay-video" loop muted playsinline class="hidden">
+            <source src="assets/overlay.mp4" type="video/mp4" />
+          </video>
+        </div>
+
+        <!-- 視覺輔助：可選的水平掃描線 -->
+        <div id="scan-line"></div>
+      </div>
+
+      <!-- 頂部工具列 -->
+      <header class="topbar">
+        <button id="btn-torch" class="btn icon-only" title="手電筒">
+          🔦
+        </button>
+        <div class="spacer"></div>
+        <button id="btn-switch-content" class="btn" title="切換疊加（圖/影片）">切換疊加</button>
+        <button id="btn-settings" class="btn icon-only" title="設定">⚙️</button>
+      </header>
+
+      <!-- 底部工具列 -->
+      <footer class="bottombar">
+        <div class="bar">
+          <button id="btn-capture" class="btn btn-primary">
+            <span class="icon">⬇️</span> 截圖保存
+          </button>
+          <button id="btn-xr" class="btn outline" title="進階AR（Beta）">XR(測試)</button>
+        </div>
+      </footer>
+    </section>
+  </div>
+
+  <!-- 隱藏處理用畫布（影像下採樣與分析） -->
+  <canvas id="proc-canvas" class="hidden"></canvas>
+  <!-- 截圖合成畫布 -->
+  <canvas id="capture-canvas" class="hidden"></canvas>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
